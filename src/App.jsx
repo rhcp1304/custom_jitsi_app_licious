@@ -515,7 +515,7 @@ function App() {
 
   // Licious Color Palette:
   // Main Accent: Licious Red/Pink: #D6003B (buttons, active states, highlights)
-  // Dominant Background: Light Pink: #FEECEF (A slightly more saturated light pink than before)
+  // Dominant Background: Light Pink: #FEECEF
   // Foreground/Panels/Cards: Pure White: #FFFFFF
   // Text: Dark Gray: #333333 or #4A4A4A for readability
   // Border/Separators: Light Gray: #E0E0E0
@@ -526,25 +526,26 @@ function App() {
   const LiciousAccentBtn = 'bg-licious-main hover:bg-[#a9002e] text-white';
   const LiciousAccentText = 'text-licious-main hover:text-[#a9002e]';
   const LiciousForegroundBg = 'bg-white';
+  const LiciousBackgroundDominant = 'bg-licious-light-pink'; // Use this for overall BG and Header
   const LiciousBorder = 'border-gray-200';
   const LiciousTextPrimary = 'text-gray-800'; // Darker text for readability on light backgrounds
   const LiciousTextSecondary = 'text-gray-600';
 
   return (
-    // Main background: Licious Light Pink
-    <div className={`h-screen w-screen flex flex-col bg-licious-light-pink ${LiciousTextPrimary} overflow-hidden`}>
-      {/* Header (Foreground: White) */}
-      <header className={`${LiciousForegroundBg} p-4 flex flex-col md:flex-row justify-between items-center flex-shrink-0 shadow-md border-b ${LiciousBorder}`}>
+    // Main background: Licious Light Pink (DOMINANT COLOR)
+    <div className={`h-screen w-screen flex flex-col ${LiciousBackgroundDominant} ${LiciousTextPrimary} overflow-hidden`}>
+      {/* Header (Background: Light Pink) */}
+      <header className={`${LiciousBackgroundDominant} p-4 flex flex-col md:flex-row justify-between items-center flex-shrink-0 shadow-md border-b ${LiciousBorder}`}>
 
         {/* Title and Controls */}
         <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
           <img src={LenskartLogo} alt="Licious Branded Logo" className="h-10 w-auto" />
           <div className="flex items-center md:hidden gap-2">
-            {/* Mobile Icons: Gray by default, Licious Red text when active */}
-            <Button onClick={togglePlaylist} variant="ghost" size="icon" className={`text-gray-500 hover:${LiciousAccentText} ${showPlaylist ? LiciousAccentText : ''}`} title={`Videos (${playlist.length})`}>
+            {/* Mobile Icons: White background/text for clarity against pink header */}
+            <Button onClick={togglePlaylist} variant="ghost" size="icon" className={`bg-white text-gray-700 hover:bg-gray-100 ${showPlaylist ? LiciousAccentText : ''}`} title={`Videos (${playlist.length})`}>
               {showPlaylist ? <ChevronDown className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </Button>
-            <Button onClick={toggleMap} variant="ghost" size="icon" className={`text-gray-500 hover:${LiciousAccentText} ${showMap ? LiciousAccentText : ''}`} title="Show Map">
+            <Button onClick={toggleMap} variant="ghost" size="icon" className={`bg-white text-gray-700 hover:bg-gray-100 ${showMap ? LiciousAccentText : ''}`} title="Show Map">
               {showMap ? <X className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
             </Button>
           </div>
@@ -569,7 +570,7 @@ function App() {
                 Share <Youtube className='w-4 h-4 ml-1' />
               </Button>
             ) : (
-              // Secondary Action (Stop): Gray Button with Licious Accent
+              // Secondary Action (Stop): Gray Button
               <Button onClick={stopVideoSharing} className='bg-gray-500 hover:bg-gray-600 text-white' disabled={isInitializing}>
                 Stop <X className='w-4 h-4 ml-1' />
               </Button>
@@ -580,11 +581,11 @@ function App() {
             </Button>
           </div>
           <div className="hidden md:flex items-center gap-2">
-             {/* Desktop Icons: Gray by default, Licious Red text when active/hovering */}
-            <Button onClick={togglePlaylist} variant="ghost" size="icon" className={`text-gray-500 hover:bg-gray-100 hover:${LiciousAccentText} ${showPlaylist ? LiciousAccentText : ''}`} title={`Videos (${playlist.length})`}>
+             {/* Desktop Icons: White button background for pop/contrast against pink header */}
+            <Button onClick={togglePlaylist} className={`bg-white text-gray-700 hover:bg-gray-100 ${showPlaylist ? LiciousAccentText : ''}`} variant="ghost" size="icon" title={`Videos (${playlist.length})`}>
               {showPlaylist ? <ChevronDown className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </Button>
-            <Button onClick={toggleMap} variant="ghost" size="icon" className={`text-gray-500 hover:bg-gray-100 hover:${LiciousAccentText} ${showMap ? LiciousAccentText : ''}`} title="Show Map">
+            <Button onClick={toggleMap} className={`bg-white text-gray-700 hover:bg-gray-100 ${showMap ? LiciousAccentText : ''}`} variant="ghost" size="icon" title="Show Map">
               {showMap ? <X className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
             </Button>
           </div>
@@ -593,11 +594,11 @@ function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 relative">
-        {/* Jitsi Container (still black background for video) */}
+        {/* Jitsi Container (Black for video, or Pink for loading) */}
         <div className="w-full h-full bg-black flex flex-col min-h-0 relative">
           {isInitializing && (
-            // Initialization screen with light pink background, Licious accent loader
-            <div className={`w-full h-full flex items-center justify-center bg-licious-light-pink ${LiciousTextPrimary}`}>
+            // Initialization screen with light pink background
+            <div className={`w-full h-full flex items-center justify-center ${LiciousBackgroundDominant} ${LiciousTextPrimary}`}>
               <div className="text-center">
                 <Loader2 className={`w-12 h-12 animate-spin ${LiciousAccentText} mx-auto mb-4`} />
                 <p className="text-xl font-medium">Initializing Licious meeting...</p>
@@ -616,16 +617,16 @@ function App() {
           />
         </div>
 
-        {/* Panels Container (Foreground: White) */}
+        {/* Panels Container (Foreground: WHITE - This is the panel sitting on the pink) */}
         {(showPlaylist || showMap) && (
           <div className={`fixed bottom-0 left-0 right-0 h-2/3 md:h-full md:relative md:w-1/3 ${LiciousForegroundBg} border-t md:border-l ${LiciousBorder} shadow-xl flex flex-col z-20 transition-transform duration-300 ease-in-out`}>
 
             {/* Playlist Panel */}
             {showPlaylist && (
               <div className="flex flex-col h-full">
-                {/* Header background very light gray */}
+                {/* Header background very light gray/off-white (still lighter than the main pink BG) */}
                 <div className={`bg-gray-50 p-4 flex flex-col items-start justify-between border-b ${LiciousBorder} flex-shrink-0`}>
-                  <h2 className="text-lg font-bold ${LiciousTextPrimary} mb-2">Video Playlist ({playlist.length})</h2>
+                  <h2 className={`text-lg font-bold ${LiciousTextPrimary} mb-2`}>Video Playlist ({playlist.length})</h2>
                   <div className="relative w-full">
                     <input
                       type="text"
