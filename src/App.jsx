@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-// Assuming the Button component still works with standard Tailwind classes
 import { Button } from '@/components/ui/button.jsx';
 import {
   MapPin, X, Youtube, List, Plus, Play, Trash2, Loader2, Search, ChevronDown, AlertCircle,
 } from 'lucide-react';
 import EnhancedFreeMap from './components/EnhancedFreeMap.jsx';
 import './App.css';
-// Assuming you want to keep your logo, even if it's Lenskart's (Licious logo would be better)
-import LenskartLogo from './logo.png';
+import LenskartLogo from './logo.png'; // Assuming this is replaced by the Licious logo
 
 function App() {
   const [showMap, setShowMap] = useState(false);
@@ -33,17 +31,14 @@ function App() {
   const syncIntervalRef = useRef(null);
   const muteIntervalRef = useRef(null);
 
-  // --- Utility Functions ---
-
+  // --- Utility Functions (Omitted for brevity, assumed unchanged) ---
   const showError = (message) => {
     setErrorMessage(message);
     setShowErrorModal(true);
   };
-
   const generateParticipantId = () => {
     return `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   };
-
   const fetchYouTubeVideoTitle = async (videoUrl) => {
     try {
       const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(videoUrl)}`);
@@ -56,7 +51,6 @@ function App() {
     }
     return 'Unknown Video';
   };
-
   const storePlaylistLocally = (playlistData) => {
     const data = {
       playlist: playlistData,
@@ -65,7 +59,6 @@ function App() {
     };
     localStorage.setItem('jitsi_shared_playlist', JSON.stringify(data));
   };
-
   const getLocalPlaylist = () => {
     try {
       const data = localStorage.getItem('jitsi_shared_playlist');
@@ -77,7 +70,6 @@ function App() {
     }
     return null;
   };
-
   const broadcastPlaylistUpdate = (action, data) => {
     if (!jitsiApi) return;
     const message = {
@@ -101,7 +93,6 @@ function App() {
     storePlaylistLocally(action === 'FULL_SYNC' ? data : playlist);
     setSyncStatus('syncing');
   };
-
   const handleIncomingMessage = (messageData) => {
     try {
       let message;
@@ -159,7 +150,6 @@ function App() {
       console.error('Error handling incoming message:', error);
     }
   };
-
   const startPeriodicSync = () => {
     if (syncIntervalRef.current) {
       clearInterval(syncIntervalRef.current);
@@ -179,7 +169,6 @@ function App() {
       }
     }, 5000);
   };
-
   const muteJitsiSharedVideo = () => {
     try {
       const jitsiVideoContainer = jitsiContainerRef.current;
@@ -207,23 +196,18 @@ function App() {
       console.error('Error muting shared video:', error);
     }
   };
-
   const stopMutingInterval = () => {
       if (muteIntervalRef.current) {
           clearInterval(muteIntervalRef.current);
           muteIntervalRef.current = null;
       }
   };
-
   const forceAudioMute = () => {
       stopMutingInterval();
       muteJitsiSharedVideo();
       muteIntervalRef.current = setInterval(muteJitsiSharedVideo, 500);
       setAudioMuted(true);
   };
-
-  // --- Jitsi Initialization and Cleanup ---
-
   const initializeJitsi = async () => {
       if (isInitializing || (jitsiInitialized && jitsiApi)) return;
       if (!window.JitsiMeetExternalAPI || !jitsiContainerRef.current) {
@@ -339,7 +323,6 @@ function App() {
           setIsInitializing(false);
       }
   };
-
   const cleanupJitsi = () => {
     stopMutingInterval();
     if (syncIntervalRef.current) {
@@ -365,13 +348,10 @@ function App() {
       }
     }
   };
-
   const initializeJitsiOnLoad = () => {
-    // UPDATED LINE: Add a cache-busting query parameter
     const jitsiScriptUrl = `https://retailiq-meeting.diq.geoiq.ai/external_api.js?v=${Date.now()}`;
     const existingScript = document.querySelector(`script[src^="https://retailiq-meeting.diq.geoiq.ai/external_api.js"]`);
 
-    // Remove the old script to ensure the new one loads
     if (existingScript) {
         existingScript.remove();
     }
@@ -383,12 +363,10 @@ function App() {
     script.onerror = () => console.error('Failed to load Jitsi External API script.');
     document.head.appendChild(script);
   };
-
   useEffect(() => {
     initializeJitsiOnLoad();
     return () => { cleanupJitsi(); };
   }, []);
-
   useEffect(() => {
     if (!jitsiContainerRef.current) return;
     const observer = new MutationObserver((mutations) => {
@@ -405,9 +383,6 @@ function App() {
     observer.observe(jitsiContainerRef.current, { childList: true, subtree: true });
     return () => { observer.disconnect(); };
   }, [jitsiContainerRef]);
-
-  // --- UI Controls ---
-
   const toggleMap = () => {
     setShowMap(!showMap);
     if (showPlaylist) setShowPlaylist(false);
@@ -431,7 +406,6 @@ function App() {
       showError('Please enter a YouTube URL');
     }
   };
-
   const stopVideoSharing = () => {
     if (jitsiApi && isVideoSharing) {
       try {
@@ -445,7 +419,6 @@ function App() {
       }
     }
   };
-
   const addToPlaylist = async () => {
     if (videoUrl && extractYouTubeVideoId(videoUrl)) {
       setIsLoadingVideoTitle(true);
@@ -478,7 +451,6 @@ function App() {
       showError('Please enter a valid YouTube URL');
     }
   };
-
   const removeFromPlaylist = (id) => {
     setPlaylist((prev) => {
       const newPlaylist = prev.filter((video) => video.id !== id);
@@ -508,24 +480,20 @@ function App() {
       showError('Please wait for the meeting to load and join first');
     }
   };
-
   const togglePlaylist = () => {
     setShowPlaylist(!showPlaylist);
     if (showMap) setShowMap(false);
   };
-
   const extractYouTubeVideoId = (url) => {
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
-
   const handleDragStart = (e, video) => {
     setDraggedItem(video);
     e.dataTransfer.effectAllowed = "move";
   };
   const handleDragOver = (e) => e.preventDefault();
-
   const handleDrop = (e, targetVideo) => {
     e.preventDefault();
     if (!draggedItem || draggedItem.id === targetVideo.id) return;
@@ -542,30 +510,35 @@ function App() {
   };
   const handleDragEnd = () => setDraggedItem(null);
   const filteredPlaylist = playlist.filter(video => video.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  // --- End Utility Functions ---
+
 
   // Licious Color Palette:
-  // Primary: Licious Red/Pink: #D6003B
-  // Secondary: White: #FFFFFF
-  // Background: Light Grey: #F5F5F5
+  // Primary (Highlight/Button): Licious Red/Pink: #D6003B
+  // Background: Very Light Pink/Off-White: #FFF7F9 (Custom class: 'bg-licious-light')
+  // Foreground/Panel: Pure White: #FFFFFF
+  // Text: Dark Gray: #333333
 
-  const LiciousPrimary = 'bg-[#D6003B] hover:bg-[#a9002e] text-white';
-  const LiciousPrimaryText = 'text-[#D6003B] hover:text-[#a9002e]';
-  const LiciousSecondaryButton = 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+  // Tailwind Configuration for custom colors (assumed in tailwind.config.js):
+  // extend: { colors: { 'licious-main': '#D6003B', 'licious-light': '#FFF7F9' } }
+
+  const LiciousPrimaryBtn = 'bg-licious-main hover:bg-[#a9002e] text-white';
+  const LiciousPrimaryText = 'text-licious-main hover:text-[#a9002e]';
   const LiciousPanelBg = 'bg-white';
-  const LiciousHeaderBg = 'bg-white';
-  const LiciousMainBg = 'bg-gray-50';
+  const LiciousText = 'text-gray-800';
 
 
   return (
-    // Change background to light grey
-    <div className={`h-screen w-screen flex flex-col ${LiciousMainBg} text-gray-800 overflow-hidden`}>
+    // Main background: Light Pink/Off-White
+    <div className={`h-screen w-screen flex flex-col bg-licious-light ${LiciousText} overflow-hidden`}>
       {/* Header */}
-      <header className={`${LiciousHeaderBg} p-4 flex flex-col md:flex-row justify-between items-center flex-shrink-0 shadow-md border-b border-gray-200`}>
+      <header className={`bg-white p-4 flex flex-col md:flex-row justify-between items-center flex-shrink-0 shadow-md border-b border-gray-100`}>
+
         {/* Title and Controls */}
         <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-          {/* Use a better logo source for Licious branding */}
           <img src={LenskartLogo} alt="Licious Branded Logo" className="h-10 w-auto" />
           <div className="flex items-center md:hidden gap-2">
+            {/* White icons on mobile, highlighted with Licious Red text */}
             <Button onClick={togglePlaylist} variant="ghost" size="icon" className={`text-gray-500 hover:text-gray-700 ${showPlaylist ? LiciousPrimaryText : ''}`} title={`Videos (${playlist.length})`}>
               {showPlaylist ? <ChevronDown className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </Button>
@@ -583,32 +556,32 @@ function App() {
               placeholder="Paste YouTube URL..."
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              // Licious style input: white background, gray border, Licious Red focus
-              className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-white text-sm placeholder-gray-500 border border-gray-300 focus:border-[#D6003B] focus:ring-1 focus:ring-[#D6003B] transition-colors"
+              // Input: White background, gray border, Licious Red focus
+              className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-white text-sm placeholder-gray-500 border border-gray-300 focus:border-licious-main focus:ring-1 focus:ring-licious-main transition-colors"
               onKeyPress={(e) => { if (e.key === 'Enter') shareVideoDirectly(); }}
               disabled={isInitializing || isLoadingVideoTitle}
             />
             {!isVideoSharing ? (
-              // Licious Red for Primary Action (Share)
-              <Button onClick={shareVideoDirectly} className={LiciousPrimary} disabled={!videoUrl.trim() || isInitializing || isLoadingVideoTitle}>
+              // Primary Action (Share): Licious Red Button
+              <Button onClick={shareVideoDirectly} className={LiciousPrimaryBtn} disabled={!videoUrl.trim() || isInitializing || isLoadingVideoTitle}>
                 Share <Youtube className='w-4 h-4 ml-1' />
               </Button>
             ) : (
-              // Secondary action button (Stop)
+              // Secondary Action (Stop): Gray Button
               <Button onClick={stopVideoSharing} className='bg-gray-500 hover:bg-gray-600 text-white' disabled={isInitializing}>
                 Stop <X className='w-4 h-4 ml-1' />
               </Button>
             )}
-            {/* Licious Red for Plus button (Add to Playlist) */}
-            <Button onClick={addToPlaylist} className={LiciousPrimary} disabled={!videoUrl.trim() || isInitializing || isLoadingVideoTitle}>
+            {/* Add to Playlist: Licious Red Button */}
+            <Button onClick={addToPlaylist} className={LiciousPrimaryBtn} disabled={!videoUrl.trim() || isInitializing || isLoadingVideoTitle}>
               {isLoadingVideoTitle ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             </Button>
           </div>
           <div className="hidden md:flex items-center gap-2">
+             {/* Icons: Gray by default, Licious Red text when active/hovering */}
             <Button onClick={togglePlaylist} variant="ghost" size="icon" className={`text-gray-500 hover:bg-gray-100 ${showPlaylist ? LiciousPrimaryText : ''}`} title={`Videos (${playlist.length})`}>
               {showPlaylist ? <ChevronDown className="w-5 h-5" /> : <List className="w-5 h-5" />}
             </Button>
-            {/* Map pin icon secondary color */}
             <Button onClick={toggleMap} variant="ghost" size="icon" className={`text-gray-500 hover:bg-gray-100 ${showMap ? LiciousPrimaryText : ''}`} title="Show Map">
               {showMap ? <X className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
             </Button>
@@ -621,7 +594,8 @@ function App() {
         {/* Jitsi Container */}
         <div className="w-full h-full bg-black flex flex-col min-h-0 relative">
           {isInitializing && (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-700">
+            // Initialization screen with light background
+            <div className="w-full h-full flex items-center justify-center bg-licious-light text-gray-700">
               <div className="text-center">
                 <Loader2 className={`w-12 h-12 animate-spin ${LiciousPrimaryText} mx-auto mb-4`} />
                 <p className="text-xl font-medium">Initializing Licious meeting...</p>
@@ -642,10 +616,13 @@ function App() {
 
         {/* Panels Container */}
         {(showPlaylist || showMap) && (
+          // Panel background is pure white
           <div className={`fixed bottom-0 left-0 right-0 h-2/3 md:h-full md:relative md:w-1/3 ${LiciousPanelBg} border-t md:border-l border-gray-200 shadow-xl flex flex-col z-20 transition-transform duration-300 ease-in-out`}>
+
             {/* Playlist Panel */}
             {showPlaylist && (
               <div className="flex flex-col h-full">
+                {/* Header background light gray */}
                 <div className="bg-gray-50 p-4 flex flex-col items-start justify-between border-b border-gray-200 flex-shrink-0">
                   <h2 className="text-lg font-bold text-gray-800 mb-2">Video Playlist ({playlist.length})</h2>
                   <div className="relative w-full">
@@ -654,12 +631,13 @@ function App() {
                       placeholder="Search videos..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      // Licious style input for search
-                      className="w-full px-3 py-1 rounded-lg bg-white text-sm placeholder-gray-500 border border-gray-300 focus:border-[#D6003B] focus:outline-none pl-8"
+                      className="w-full px-3 py-1 rounded-lg bg-white text-sm placeholder-gray-500 border border-gray-300 focus:border-licious-main focus:outline-none pl-8"
                     />
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   </div>
                 </div>
+
+                {/* Playlist Items */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                   {filteredPlaylist.length === 0 ? (
                     <div className="text-gray-500 text-center py-8">
@@ -675,8 +653,8 @@ function App() {
                           bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200
                           flex items-center gap-4 cursor-grab
                           active:cursor-grabbing transform transition-all duration-150
-                          ${draggedItem?.id === video.id ? 'opacity-70 scale-[0.98] ring-2 ring-[#D6003B]' : ''}
-                          ${currentSharedVideo === video.url ? 'border-l-4 border-[#D6003B]' : 'border-l-4 border-transparent'}
+                          ${draggedItem?.id === video.id ? 'opacity-70 scale-[0.98] ring-2 ring-licious-main' : ''}
+                          ${currentSharedVideo === video.url ? 'border-l-4 border-licious-main' : 'border-l-4 border-transparent'}
                         `}
                         draggable
                         onDragStart={(e) => handleDragStart(e, video)}
@@ -689,17 +667,14 @@ function App() {
                         </div>
                         <div className="flex-shrink-0 flex items-center gap-2 ml-4">
                           {currentSharedVideo === video.url ? (
-                            // Stop button secondary color
                             <Button onClick={stopVideoSharing} variant="ghost" size="icon" className='text-gray-500 hover:bg-gray-200' title="Stop this video" disabled={isInitializing}>
                               <X className="w-4 h-4" />
                             </Button>
                           ) : (
-                            // Play button Licious Red
                             <Button onClick={() => handleShareVideo(video.url)} variant="ghost" size="icon" className={LiciousPrimaryText} title="Play this video now" disabled={isInitializing}>
                               <Play className="w-4 h-4" />
                             </Button>
                           )}
-                          {/* Trash button Licious Red */}
                           <Button onClick={() => removeFromPlaylist(video.id)} variant="ghost" size="icon" className={LiciousPrimaryText} title="Remove from playlist" disabled={isInitializing}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -743,7 +718,7 @@ function App() {
               {errorMessage}
             </p>
             <div className="mt-6 flex justify-end">
-              <Button onClick={() => setShowErrorModal(false)} className={LiciousPrimary}>
+              <Button onClick={() => setShowErrorModal(false)} className={LiciousPrimaryBtn}>
                 Close
               </Button>
             </div>
